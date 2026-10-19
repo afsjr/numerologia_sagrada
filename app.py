@@ -116,9 +116,10 @@ def save_orders(orders: list[dict]) -> None:
     ORDERS_FILE.write_text(json.dumps(orders, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def make_pdf(order: dict) -> Path:
-    PDF_DIR.mkdir(parents=True, exist_ok=True)
-    path = PDF_DIR / f"mapa-{order['id']}.pdf"
+def make_pdf(order: dict, output_dir: Path | None = None) -> Path:
+    destination = output_dir or PDF_DIR
+    destination.mkdir(parents=True, exist_ok=True)
+    path = destination / f"mapa-{order['id']}.pdf"
     result = order["calculation"]
     styles = getSampleStyleSheet()
     title = ParagraphStyle("Title", parent=styles["Title"], fontName="Helvetica-Bold", fontSize=21, leading=25, alignment=TA_CENTER, textColor=HexColor("#1d2938"), spaceAfter=8)

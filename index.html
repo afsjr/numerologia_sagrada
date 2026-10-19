@@ -14,9 +14,33 @@
     <section class="purpose"><div><p class="eyebrow">por que existimos</p><h2>Um mapa não escolhe<br><em>por você.</em></h2></div><div class="purpose-copy"><p>A Aurora nasceu para transformar a numerologia em uma experiência de escuta, reflexão e escolha consciente. A partir do seu nome e da sua data de nascimento, organizamos símbolos e interpretações em uma leitura feita para reconhecer forças, desejos, padrões e possibilidades.</p><p>Não entregamos sentenças sobre o futuro. Entregamos perguntas melhores, referências para olhar para a própria história e um espaço de reconexão com aquilo que pede presença.</p><p class="purpose-note">A tecnologia organiza os cálculos. A revisão humana cuida do sentido.</p></div></section>
     <section class="product" id="mapa"><div><p class="eyebrow">experiência principal</p><h2>Mapa numerológico<br><em>personalizado</em></h2><p>Uma leitura feita a partir do seu nome de nascimento, data de nascimento e ano que deseja observar. O relatório é revisado pela especialista antes de ser entregue.</p><ul><li>Cálculos principais e números mestres</li><li>Personalidade, desejos, relações e vocação</li><li>Ciclos, desafios e orientação prática</li><li>PDF elegante para guardar e reler</li></ul></div><div class="price-card"><p>Mapa completo</p><strong>sob consulta</strong><small>Você envia seus dados. Retornamos com as condições de pagamento e prazo de revisão.</small><a class="button dark" href="#pedido">Solicitar meu mapa</a></div></section>
     <section class="sagrado" id="sagrado"><div class="sagrado-symbol">◐</div><div><p class="eyebrow">em desenvolvimento</p><h2>Sagrado feminino</h2><p>Uma área para práticas, reflexões e conteúdos sobre ciclos, corpo, intuição e reconexão. Em breve, novas experiências para caminhar junto com o seu mapa.</p></div></section>
-    <section class="order" id="pedido"><div><p class="eyebrow">primeiro passo</p><h2>Comece pela sua<br><em>história.</em></h2><p>Preencha os dados abaixo. O pedido será recebido pela especialista, que fará a revisão do mapa antes da entrega.</p></div><form method="post" action="/orders"><label>Nome completo de nascimento<input name="name" required minlength="3" placeholder="Como está na certidão de nascimento"></label><label>E-mail<input type="email" name="email" required placeholder="voce@email.com"></label><label>Data de nascimento<input type="date" name="birth_date" required></label><label>Ano que deseja analisar<input type="number" name="target_year" value="2027" min="1900" max="2200" required></label><label class="check"><input type="checkbox" required> Li que a numerologia é uma ferramenta simbólica de autoconhecimento.</label><button class="button" type="submit">Enviar meus dados <span>↗</span></button></form></section>
-    <div class="notice">{{MESSAGE}}</div>
+    <section class="order" id="pedido"><div><p class="eyebrow">primeiro passo</p><h2>Comece pela sua<br><em>história.</em></h2><p>Preencha os dados abaixo. O pedido será recebido e o mapa será gerado para download. Em uma próxima etapa, conectaremos o fluxo à revisão e ao envio por e-mail.</p></div><form id="order-form" method="post" action="/api/orders"><label>Nome completo de nascimento<input name="name" required minlength="3" placeholder="Como está na certidão de nascimento"></label><label>E-mail<input type="email" name="email" required placeholder="voce@email.com"></label><label>Data de nascimento<input type="date" name="birth_date" required></label><label>Ano que deseja analisar<input type="number" name="target_year" value="2027" min="1900" max="2200" required></label><label class="check"><input type="checkbox" required> Li que a numerologia é uma ferramenta simbólica de autoconhecimento.</label><button class="button" type="submit">Gerar meu mapa <span>↗</span></button></form></section>
+    <div class="notice" id="notice">{{MESSAGE}}</div>
   </main>
   <footer><div class="brand"><span class="brand-mark">✦</span><span>AURORA<br><small>autoconhecimento</small></span></div><p>Uma porta para dentro.</p><small>© 2026 Aurora. Leituras simbólicas para autoconhecimento.</small></footer>
 </body>
+<script>
+  const form = document.getElementById('order-form');
+  const notice = document.getElementById('notice');
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const button = form.querySelector('button');
+    button.disabled = true;
+    button.innerHTML = 'Preparando seu mapa…';
+    notice.textContent = 'Estamos organizando seus cálculos. Aguarde um instante.';
+    try {
+      const response = await fetch(form.action, { method: 'POST', body: new URLSearchParams(new FormData(form)) });
+      if (!response.ok) throw new Error('Não foi possível gerar o mapa.');
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      notice.innerHTML = 'Seu mapa está pronto. <a class="download-link" href="' + url + '" download="mapa-numerologico.pdf">Baixar mapa numerológico ↗</a>';
+      form.reset();
+    } catch (error) {
+      notice.textContent = error.message;
+    } finally {
+      button.disabled = false;
+      button.innerHTML = 'Gerar meu mapa <span>↗</span>';
+    }
+  });
+</script>
 </html>
